@@ -101,10 +101,18 @@ class SQLObject
   end
 
   def update
-    # ...
+    col_names = self.class.columns.map { |column| "#{column} = ?"}.join(', ')
+    DBConnection.execute(<<-SQL, *attribute_values, id)
+      UPDATE
+        #{self.class.table_name}
+      SET
+        #{col_names}
+      WHERE
+        id = ?
+    SQL
   end
 
   def save
-    # ...
+    id.nil? ? insert : update
   end
 end
